@@ -44,3 +44,4 @@ html_sidebars = {
 }
 
 html_static_path = ['_static']
+html_favicon = '_static/favicon.webp'
