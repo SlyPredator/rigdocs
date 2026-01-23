@@ -138,17 +138,18 @@ Provided you have a valid bag file, you will be calibrating
 
 in that order.
 
-For the below steps, we are using an Aprilgrid printed on an A4 sheet.
+For the below steps, we are using an [Aprilgrid](https://drive.google.com/file/d/14dY7z8pDb2iEBdveTviDXsoi5H9AaQP1/view?usp=sharing) printed on an A4 sheet.
 
 ### Camera calibration
 
 You do not need the camera connected for this step. The bag file you have recorded earlier is enough.
 
-To calibrate the camera, you need only one thing:
+To calibrate the camera, you need only one file:
 - The `.yaml` file containing the details of the AprilGrid you recorded the bag on
 
 This file should be in the same directory as the bag file, i.e., `data` folder inside the container
 
+`april_6x6.yaml`
 ```yaml
 target_type: 'aprilgrid'
 tagCols: 6
@@ -178,7 +179,7 @@ You do not need the camera connected for this step. The bag file you have record
 
 To calibrate the camera, you need only one thing:
 - The `.yaml` file containing the details of the AprilGrid you recorded the bag on
-- The `.yaml` file containing the details of the camera
+- The `.yaml` file containing the details (intrinsics) of the IMU
 
 These files should be in the same directory as the bag file, i.e., `data` folder inside the container
 
