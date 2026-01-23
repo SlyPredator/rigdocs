@@ -24,8 +24,8 @@ RIG Docs
 
    content/test/index
 
-Indices and tables
-==================
+Welcome to the documentation website of Robotics Interest Group (RIGNITC)! Here you will find detailed tutorials
+for complicated setups that we use in our lab for specific purposes. The sidebar on the left contains the list of
+articles written for each of these.
 
-* :ref:`genindex`
-* :ref:`search`
+Happy browsing and keep building!
