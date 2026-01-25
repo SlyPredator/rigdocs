@@ -4,8 +4,6 @@ This is a guide to get started with ROVIO. This particular guide will focus on u
 
 ```{warning}
 This article is still in an experimental and live stage, further information or corrections will be added as and when verified to be true.
-The Docker container is not final, only what is working is updated for now.
-Many of the files listed here, are hardcoded into the article, later to be abstracted away into a repo clone.
 ```
 
 ## 1. Prerequisites
@@ -30,39 +28,66 @@ git clone https://github.com/ethz-asl/kindr.git
 
 Create a Dockerfile in the same directory as `rovio` folder:
 
+```{tip}
+Please adjust `-j6` in the Dockerfile, based on your `echo $(nproc)` output.
+For example, if it is 8, set it to 5 or 6, if it is 20, set it to 12 or 16.
+
+This will help your system to not crash while building the binaries.
+```
+
 `Dockerfile`
 
 ```docker
 FROM osrf/ros:noetic-desktop-full
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    cmake \
-    libfreeimage-dev \
-    libglew-dev \
-    python3-catkin-tools \
-    ros-noetic-realsense2-camera \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y \
+    git wget autoconf automake nano \
+    python3-dev python3-pip python3-scipy python3-matplotlib \
+    ipython3 python3-wxgtk4.0 python3-tk python3-igraph python3-pyx \
+    libeigen3-dev libboost-all-dev libsuitesparse-dev \
+    doxygen cmake libfreeimage-dev libglew-dev freeglut3-dev\
+    curl gnupg2 lsb-release libopencv-dev \
+    libpoco-dev libtbb-dev libblas-dev liblapack-dev libv4l-dev \
+    python3-catkin-tools python3-osrf-pycommon \
     && rm -rf /var/lib/apt/lists/
 
+# Install Intel RealSense SDK
 RUN mkdir -p /etc/apt/keyrings && \
-curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | tee /etc/apt/keyrings/librealsense.pgp > /dev/null && \
-echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/librealsense.list && \
-apt-get update && apt-get install -y \
-librealsense2-utils librealsense2-dev ros-noetic-realsense2-camera \
-&& rm -rf /var/lib/apt/lists/
+    curl -sSf https://librealsense.intel.com/Debian/librealsense.pgp | tee /etc/apt/keyrings/librealsense.pgp > /dev/null && \
+    echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/librealsense.list && \
+    apt-get update && apt-get install -y \
+    librealsense2-utils librealsense2-dev ros-noetic-realsense2-camera \
+    && rm -rf /var/lib/apt/lists/
 
-# Create workspace structure
-RUN mkdir -p /catkin_ws/src
-WORKDIR /catkin_ws
+ENV WORKSPACE /catkin_ws
+RUN mkdir -p $WORKSPACE/src
 
-# Pre-build setup (source ROS in bashrc)
-RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
-RUN echo "source /catkin_ws/devel/setup.bash" >> ~/.bashrc
+RUN cd $WORKSPACE && \
+    catkin init && \
+    catkin config --extend /opt/ros/noetic && \
+    catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-# Set the working directory to the workspace
-WORKDIR /catkin_ws
+COPY . $WORKSPACE/src/isro_rovio
+
+RUN sed -i 's/CV_GRAY2RGB/cv::COLOR_GRAY2RGB/g' $WORKSPACE/src/isro_rovio/rovio/include/rovio/ImgUpdate.hpp
+RUN sed -i 's/${catkin_LIBRARIES}/${catkin_LIBRARIES} GLEW GL/g' $WORKSPACE/src/isro_rovio/rovio/CMakeLists.txt
+RUN sed -i 's/set(ROVIO_CHECK_JACOBIANS 1)/set(ROVIO_CHECK_JACOBIANS 0)/g' $WORKSPACE/src/isro_rovio/rovio/CMakeLists.txt
+
+RUN cd $WORKSPACE && \
+    catkin build rovio kindr -j6 --cmake-args -DCMAKE_BUILD_TYPE=Release -DMAKE_SCENE=ON
+
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
+    echo "source $WORKSPACE/devel/setup.bash" >> ~/.bashrc
+
+WORKDIR $WORKSPACE
+ENTRYPOINT ["/bin/bash", "-c", "source $WORKSPACE/devel/setup.bash && /bin/bash"]
 ```
+
+```{note}
+The first two `sed` commands are to replace two references inside the libraries that are broken and causes the build to fail otherwise.
+```
+
 
 Similarly, a `docker-compose.yml`:
 
@@ -70,16 +95,17 @@ Similarly, a `docker-compose.yml`:
 version: '3.8'
 
 services:
-  rovio:
+  isro_rovio:
     build: .
-    container_name: ro_sense
+    container_name: isro_rovio
     network_mode: host
     privileged: true
     volumes:
       - .:/catkin_ws/src/isro_rovio
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /dev:/dev              # Allows seeing the camera after reset
-      - /run/udev:/run/udev:ro  # Helps librealsense manage device state
+      - /dev:/dev
+      - /dev/dri:/dev/dri
+      - /run/udev:/run/udev:ro
     environment:
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
@@ -97,7 +123,7 @@ docker compose up -d
 ```
 
 This will build the Docker container with:
-- A local bind mount of `data` folder to `data` inside the container
+- A local bind mount of your `isro_rovio` folder to `catkin_ws/src/isro_rovio` inside the container
 - Intel Realsense SDK for ROS1
 - ROVIO binaries built for ROS1
 
@@ -117,41 +143,18 @@ Firstly run `xhost +local:docker` to grant screen display permissions to Docker.
 
 Also connect your Intel Realsense camera to a USB port on your system, make sure it is a USB 3.2 port, verify with `lsusb -t` where you should see an entry under Bus 1 or 2 with several `5000M`s. This verifies that the camera is connected to a high-speed port and can transfer data without latency.
 
-Make sure you're still inside the `isro_ws/src/isro_rovio` directory. Run `docker start -ai ro_sense` to start the container.
+Make sure you're still inside the `isro_ws/src/isro_rovio` directory. Run `docker start -ai isro_rovio` to start the container.
 
-Open up few other terminals and type `docker exec -it ro_sense bash` to open multiple terminals inside the container.
+Open up few other terminals and type `docker exec -it isro_rovio bash` to open multiple terminals inside the container.
 
 ```{note}
-No need to run `docker start -ai ro_sense` multiple times, if one terminal has started it, the other terminals can use `docker exec -it ro_sense bash` to start a new terminal inside the already running container.
+No need to run `docker start -ai isro_rovio` multiple times, if one terminal has started it, the other terminals can use `docker exec -it isro_rovio bash` to start a new terminal inside the already running container.
 ```
 
 ### Verify Intel Realsense is detected inside the container
 
 Run this command to verify the Realsense camera: `realsense-viewer`
 Once it loads up, toggle to the 2D section (button is on top right) and toggle the 3 buttons one by one on the left side to verify each of the modules are working.
-
-### Building ROVIO binaries
-
-We now need to build ROVIO to be able to use it, so we will proceed with that:
-
-```bash
-cd ~/catkin_ws
-sed -i 's/CV_GRAY2RGB/cv::COLOR_GRAY2RGB/g' /catkin_ws/srcisro_rovio/rovio/include/rovio/ImgUpdate.hpp
-sed -i 's/${catkin_LIBRARIES}/${catkin_LIBRARIES} GLEW GL/g' /catkin_ws/src/isro_rovio/rovio/CMakeLists.txt
-
-catkin build rovio --cmake-args -DCMAKE_BUILD_TYPE=Release -DMAKE_SCENE=ON -j6
-```
-
-```{tip}
-Please adjust `-j6` in the Dockerfile, based on your `echo $(nproc)` output.
-For example, if it is 8, set it to 5 or 6, if it is 20, set it to 12 or 16.
-
-This will help your system to not crash while building the binaries.
-```
-
-```{note}
-The first two `sed` commands are to replace two references inside the libraries that are broken and causes the build to fail otherwise.
-```
 
 Once that is done, source the install files:
 ```bash
@@ -160,7 +163,7 @@ source devel/setup.bash
 
 ## 4. Running ROVIO
 
-Once all of the above builds are done, we can now proceed to use ROVIO itself.
+Once all of the above checks are done, we can now proceed to use ROVIO itself.
 
 ### Starting up the Realsense publisher
 
@@ -176,11 +179,18 @@ roslaunch realsense2_camera rs_camera.launch \
 
 ### Making the necessary files for ROVIO to run
 
-Navigate inside the `rovio/cfg` folder and create the below two files:
+Navigate inside the `catkin_ws/src/isro_rovio/rovio/cfg` folder and create the below two files:
+
+```bash
+cd ~/catkin_ws/src/isro_rovio/rovio/cfg
+touch rovio.info d435i.yaml
+```
 
 ```{warning}
 These files are not finalized. This serves as a self-reminder to update them.
 ```
+
+Edit the files using `nano <file_name>`: (Shortcuts to save and exit are: `Ctrl+O` -> `Enter` -> `Ctrl+X`)
 
 `d435i.yaml`
 
@@ -440,4 +450,4 @@ roslaunch rovio rovio_node.launch \
     imu0_topic:=/camera/imu
 ```
 
-Still to be updated.
+You should now see a (yellow) Scene GUI window open up showing you the _pose updates_ from the camera.
