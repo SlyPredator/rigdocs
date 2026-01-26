@@ -37,6 +37,8 @@ This will help your system to not crash while building the binaries.
 
 `Dockerfile`
 
+```{dropdown} Click to see Dockerfile
+:animate: fade-in
 ```docker
 FROM osrf/ros:noetic-desktop-full
 
@@ -90,6 +92,9 @@ The first two `sed` commands are to replace two references inside the libraries 
 
 
 Similarly, a `docker-compose.yml`:
+
+```{dropdown} Click to see docker-compose.yml
+:animate: fade-in
 
 ```docker
 version: '3.8'
@@ -211,7 +216,12 @@ distortion_coefficients:
   data: [0.0, 0.0, 0.0, 0.0, 0.0]
 ```
 
-`rovio.info` (Click the copy button on top right)
+`rovio.info` 
+
+```{dropdown} Click to see rovio.info
+:animate: fade-in
+
+(Click the copy button on top right)
 
 ```text
 ; You can partially override parameter set in this file by creating your own subset of parameter in a separate info-file and include it with:

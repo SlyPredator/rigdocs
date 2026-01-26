@@ -12,7 +12,8 @@ extensions = [
     "myst_parser",           # For Markdown support
     "sphinx.ext.autodoc",    # For documenting code
     "sphinx.ext.napoleon",   # For Google/NumPy style docstrings
-    "sphinx_copybutton",     # Adds a copy button to code blocks
+    "sphinx_copybutton",  
+    "sphinx_design",   # Adds a copy button to code blocks
 ]
 
 # Configure MyST-Parser to enable heading anchors
