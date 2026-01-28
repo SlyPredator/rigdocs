@@ -17,16 +17,14 @@ This article is still in an experimental and live stage, further information or 
 We need to clone the ROVIO and Kindr repositories locally first, so we can build it inside the container later.
 
 ```bash
-mkdir -p ~/isro_ws/src/isro_rovio
-cd ~/isro_ws/src/isro_rovio
-rm -rf rovio lightweight_filtering kindr
-git clone --recursive https://github.com/ethz-asl/rovio.git
-git clone https://github.com/ethz-asl/kindr.git
+mkdir -p ~/isro_ws/src
+git clone --recursive https://github.com/SlyPredator/isro_rovio
+cd isro_rovio
 ```
 
 ### b. Build the Docker container
 
-Create a Dockerfile in the same directory as `rovio` folder:
+<!-- Create a Dockerfile in the same directory as `rovio` folder: -->
 
 ```{tip}
 Please adjust `-j6` in the Dockerfile, based on your `echo $(nproc)` output.
@@ -34,7 +32,7 @@ For example, if it is 8, set it to 5 or 6, if it is 20, set it to 12 or 16.
 
 This will help your system to not crash while building the binaries.
 ```
-
+<!-- 
 `Dockerfile`
 
 ```{dropdown} Click to see Dockerfile
@@ -119,9 +117,9 @@ services:
     stdin_open: true
     tty: true
     command: /bin/bash
-```
+``` -->
 
-Finally, build the container:
+Build the container:
 
 ```bash
 docker compose up -d
@@ -172,17 +170,24 @@ Once all of the above checks are done, we can now proceed to use ROVIO itself.
 
 ### Starting up the Realsense publisher
 
+<!-- # roslaunch realsense2_camera rs_camera.launch \
+    # unite_imu_method:="linear_interpolation" \
+#     enable_gyro:=true \
+#     enable_accel:=true \
+#     enable_infra1:=true \
+#     enable_infra2:=true \
+#     initial_reset:=true -->
+
 ```bash
 roslaunch realsense2_camera rs_camera.launch \
-    unite_imu_method:="linear_interpolation" \
+    unite_imu_method:=copy \
     enable_gyro:=true \
     enable_accel:=true \
-    enable_infra1:=true \
-    enable_infra2:=true \
-    initial_reset:=true
+    enable_color:=true \
+    enable_depth:=true
 ```
 
-### Making the necessary files for ROVIO to run
+<!-- ### Making the necessary files for ROVIO to run
 
 Navigate inside the `catkin_ws/src/isro_rovio/rovio/cfg` folder and create the below two files:
 
@@ -448,16 +453,36 @@ VelocityUpdate
     qAM_z 0
     qAM_w 1
 }
-```
+``` -->
 
 ### Running the ROVIO node
 
 Finally, if all of the above have been done correctly, we should now be able get estimated poses from ROVIO. The below command starts up the ROVIO node:
 
 ```bash
-roslaunch rovio rovio_node.launch \
-    cam0_topic:=/camera/infra1/image_rect_raw \
-    imu0_topic:=/camera/imu
+roslaunch rovio rovio_node.launch
 ```
 
 You should now see a (yellow) Scene GUI window open up showing you the _pose updates_ from the camera.
+
+### Visualising the odometry from ROVIO as a path
+
+From the `/rovio/odometry` topic, we can now visualise how our perception unit moves synchronously in the 3D space in RViz. We will be generating a `/my_path` topic by mapping the odometry from the `world` frame to the `imu` frame.
+
+Run the below command to publish the topic:
+
+```bash
+roslaunch rovio_tools rovio_path.launch
+```
+
+This now creates a topic called `/my_path` which you can verify publishes at 10 Hz by running `rostopic hz /my_path`
+
+```{note}
+In case you want to change the topic name, go into `isro_rovio/rovio_tools/launch` and change the parameter `out_topic_name` to one of your choosing, after which you will need to run `catkin build rovio_tools` from the `catkin_ws` directory, then run the script again.
+```
+
+While that script is running, open up RViz in a separate terminal and:
+- Change the `Fixed Frame` topic to `world`
+- Add a display called `Path` and it should be reading from the topic that you have created above, in this case, `/my_path`
+
+Now you should be able to move your perception unit around and see the line materialize in the RViz display corresponding to how you're moving it in the real world with perhaps very minimal drift.
