@@ -18,6 +18,7 @@ We need to clone the ROVIO and Kindr repositories locally first, so we can build
 
 ```bash
 mkdir -p ~/isro_ws/src
+cd ~/isro_ws/src
 git clone --recursive https://github.com/SlyPredator/isro_rovio
 cd isro_rovio
 ```
@@ -463,7 +464,7 @@ Finally, if all of the above have been done correctly, we should now be able get
 roslaunch rovio rovio_node.launch
 ```
 
-You should now see a (yellow) Scene GUI window open up showing you the _pose updates_ from the camera.
+You should now see a (yellow) Scene GUI window open up showing you the _pose updates_ from the camera. Verify the `/rovio/odometry` topic is indeed publishing.
 
 ### Visualising the odometry from ROVIO as a path
 
@@ -475,10 +476,13 @@ Run the below command to publish the topic:
 roslaunch rovio_tools rovio_path.launch
 ```
 
-This now creates a topic called `/my_path` which you can verify publishes at 10 Hz by running `rostopic hz /my_path`
+This now creates a topic called `/my_path` which you can verify publishes at 10 Hz by running `rostopic hz /my_path`.
 
 ```{note}
-In case you want to change the topic name, go into `isro_rovio/rovio_tools/launch` and change the parameter `out_topic_name` to one of your choosing, after which you will need to run `catkin build rovio_tools` from the `catkin_ws` directory, then run the script again.
+In case you want to change the topic name, use the argument `out_topic:='new_topic_name'` along with the above roslaunch command.
+Example: You want your new topic name to be `my_own_rovio_path`. So then the command would be:
+```bash
+roslaunch rovio_tools rovio_path.launch out_topic:='my_own_rovio_path'
 ```
 
 While that script is running, open up RViz in a separate terminal and:
