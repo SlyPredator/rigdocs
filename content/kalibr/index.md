@@ -127,8 +127,8 @@ roslaunch mavros px4.launch fcu_url:=/dev/ttyACM0:115200
 Then in a separate terminal, run `rosservice call /mavros/set_stream_rate 0 200 1` to set the IMU publishing rate at 200 Hz (or whatever you set the 200 argument to).
 
 In a separate terminal within the container, verify that the following topics are being published:
-- *_/mavros/imu/data_raw_* - `rostopic echo /mavros/imu/data_raw` or `rostopic hz /mavros/imu/data_raw` 
-- */camera/color/image_raw_* - `rostopic echo /camera/color/image_raw` or `rostopic hz /camera/color/image_raw`
+- *_/mavros/imu/data_raw_* - `rostopic echo /mavros/imu/data_raw` or `rostopic hz /mavros/imu/data_raw` (Check rate!)
+- */camera/color/image_raw* - `rostopic echo /camera/color/image_raw` or `rostopic hz /camera/color/image_raw`
 :::
 
 :::{tab-item} Realsense Camera & IMU
@@ -147,7 +147,7 @@ roslaunch realsense2_camera rs_camera.launch \
 
 In a separate terminal within the container, verify that the following topics are being published:
 - *_/camera/imu_* - `rostopic echo /camera/imu` or `rostopic hz /camera/imu` 
-- */camera/color/image_raw_* - `rostopic echo /camera/color/image_raw` or `rostopic hz /camera/color/image_raw`
+- */camera/color/image_raw* - `rostopic echo /camera/color/image_raw` or `rostopic hz /camera/color/image_raw`
 :::
 
 :::: 
