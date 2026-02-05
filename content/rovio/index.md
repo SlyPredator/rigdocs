@@ -167,9 +167,9 @@ source devel/setup.bash
 
 ## 4. Running ROVIO
 
-Once all of the above checks are done, we can now proceed to use ROVIO itself.
+### Starting up the publishers for camera and IMU
 
-### Starting up the Realsense publisher
+Once all of the above checks are done, we can now proceed to use ROVIO itself.
 
 <!-- # roslaunch realsense2_camera rs_camera.launch \
     # unite_imu_method:="linear_interpolation" \
@@ -179,6 +179,35 @@ Once all of the above checks are done, we can now proceed to use ROVIO itself.
 #     enable_infra2:=true \
 #     initial_reset:=true -->
 
+Use the below tabs to navigate between your choice of sensors:
+
+::::{tab-set}
+
+:::{tab-item} Pixhawk IMU (recommended) & Realsense Camera
+
+### Realsense Camera publisher
+
+```bash
+roslaunch realsense2_camera rs_camera.launch \
+    enable_color:=true \
+    enable_depth:=true
+```
+
+### Pixhawk IMU via MAVROS
+
+```bash
+roslaunch mavros px4.launch fcu_url:=/dev/ttyACM0:115200
+```
+
+Then in a separate terminal, run `rosservice call /mavros/set_stream_rate 0 200 1` to set the IMU publishing rate at 200 Hz (or whatever you set the 200 argument to).
+
+Verify the same with `rostopic hz /mavros/imu/data_raw` to see if the IMU stream is indeed at your desired rate.
+:::
+
+:::{tab-item} Realsense Camera & IMU
+
+### Realsense Camera and IMU publisher
+
 ```bash
 roslaunch realsense2_camera rs_camera.launch \
     unite_imu_method:=copy \
@@ -186,7 +215,11 @@ roslaunch realsense2_camera rs_camera.launch \
     enable_accel:=true \
     enable_color:=true \
     enable_depth:=true
+    enable_sync:=true
 ```
+:::
+
+::::
 
 <!-- ### Making the necessary files for ROVIO to run
 

@@ -104,15 +104,53 @@ For your own sanity, it is recommended to add the sourcing lines to your `.bashr
 
 Once all the preliminary checks from above has been done, you can proceed to calibration.
 
-### Starting up the Realsense publisher
+Use the below tabs to navigate between your choice of sensors:
+
+::::{tab-set}
+
+:::{tab-item} Pixhawk IMU (recommended) & Realsense Camera
+
+### Realsense Camera publisher
 
 ```bash
-roslaunch realsense2_camera rs_camera.launch     enable_gyro:=true     enable_accel:=true     unite_imu_method:="linear_interpolation"     enable_sync:=true
+roslaunch realsense2_camera rs_camera.launch \
+    enable_color:=true \
+    enable_depth:=true
+```
+
+### Pixhawk IMU via MAVROS
+
+```bash
+roslaunch mavros px4.launch fcu_url:=/dev/ttyACM0:115200
+```
+
+Then in a separate terminal, run `rosservice call /mavros/set_stream_rate 0 200 1` to set the IMU publishing rate at 200 Hz (or whatever you set the 200 argument to).
+
+In a separate terminal within the container, verify that the following topics are being published:
+- *_/mavros/imu/data_raw_* - `rostopic echo /mavros/imu/data_raw` or `rostopic hz /mavros/imu/data_raw` 
+- */camera/color/image_raw_* - `rostopic echo /camera/color/image_raw` or `rostopic hz /camera/color/image_raw`
+:::
+
+:::{tab-item} Realsense Camera & IMU
+
+### Realsense Camera and IMU publisher
+
+```bash
+roslaunch realsense2_camera rs_camera.launch \
+    unite_imu_method:="linear_interpolation" \
+    enable_gyro:=true \
+    enable_accel:=true \
+    enable_color:=true \
+    enable_depth:=true \
+    enable_sync:=true
 ```
 
 In a separate terminal within the container, verify that the following topics are being published:
 - *_/camera/imu_* - `rostopic echo /camera/imu` or `rostopic hz /camera/imu` 
-- */camera/color/image_raw_* - `rostopic echo /camera/color/image_raw` or `rostopic hz /camera/color/image_raw` 
+- */camera/color/image_raw_* - `rostopic echo /camera/color/image_raw` or `rostopic hz /camera/color/image_raw`
+:::
+
+:::: 
 
 ### Starting the rosbag recording
 
