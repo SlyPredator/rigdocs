@@ -1,0 +1,101 @@
+/* ==========================================================================
+   Left Sidebar: Collapsible Sections
+   ========================================================================== */
+
+.globaltoc p.caption {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  cursor: pointer !important;
+  user-select: none;
+  padding: 0.35rem 0;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: color 0.15s ease;
+}
+
+.globaltoc p.caption:hover {
+  color: var(--sy-c-accent, #3b82f6) !important;
+}
+
+.globaltoc p.caption .caption-chevron {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.globaltoc p.caption.is-collapsed .caption-chevron {
+  transform: rotate(-90deg);
+}
+
+.globaltoc ul.is-collapsed {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Right Sidebar: "On This Page" (Local TOC) Visual Polish
+   ========================================================================== */
+
+@media (min-width: 1280px) {
+  #rside.sy-rside {
+    width: 17.5rem !important; /* 280px for comfortable reading without wrapping */
+  }
+}
+
+.localtoc h3 {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 0.75rem !important;
+  opacity: 0.75;
+}
+
+.localtoc > ul {
+  border-left: 1px solid rgba(148, 163, 184, 0.2) !important;
+  padding-left: 0.75rem !important;
+  margin-left: 0.25rem !important;
+  list-style: none !important;
+}
+
+.localtoc li {
+  margin: 0.35rem 0 !important;
+  line-height: 1.35 !important;
+}
+
+.localtoc a {
+  font-size: 0.8125rem !important;
+  line-height: 1.35 !important;
+  color: var(--sy-c-text, #ffffff) !important;
+  display: inline-block;
+  text-decoration: none !important;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.localtoc a:hover {
+  color: var(--sy-c-accent, #3b82f6) !important;
+  transform: translateX(2px);
+}
+
+.localtoc li.active > a,
+.localtoc a.active,
+.localtoc a.current,
+.localtoc li.current > a {
+  color: var(--sy-c-accent, #3b82f6) !important;
+  font-weight: 600 !important;
+}
+
+.localtoc ul ul {
+  border-left: 1px solid rgba(148, 163, 184, 0.15) !important;
+  padding-left: 0.65rem !important;
+  margin: 0.25rem 0 !important;
+  list-style: none !important;
+}

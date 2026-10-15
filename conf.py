@@ -32,12 +32,14 @@ html_theme_options = {
     #     {"title": "Projects", "url": "index"},
     #     {"title": "GitHub", "url": "https://github.com/your-username"},
     # ],
+    "github_url": "https://github.com/rignitc/rig_wiki",
+    "nav_socials": True,
     "accent_color": "blue",  # Can be: red, orange, yellow, green, blue, iris, purple
-    "globaltoc_collapse": False,
+    "toctree_collapse": False,
     "globaltoc_expand_depth": 1,
 }
 
-# This ensures the sidebar shows up on every page
+# Sidebar configuration
 html_sidebars = {
     "**": [
         "sidebars/localtoc.html",
@@ -46,3 +48,11 @@ html_sidebars = {
 
 html_static_path = ['_static']
 html_favicon = '_static/favicon.webp'
+
+html_css_files = [
+    'sidebar-collapse.css',
+]
+
+html_js_files = [
+    'sidebar-collapse.js',
+]
