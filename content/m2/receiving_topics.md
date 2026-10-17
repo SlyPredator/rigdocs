@@ -46,6 +46,14 @@ Configure your Ethernet network interface with the following parameters:
 | **Netmask** | `255.255.255.0` |
 | **Gateway** | Leave blank |
 
+```{figure} images/network.webp
+:alt: Network Diagram
+:align: center
+:width: 60%
+
+Svan M2 Network Architecture
+```
+
 ## 3. Physical Connection
 
 1. Connect an Ethernet cable directly from your laptop's Ethernet port to the robot's network port.

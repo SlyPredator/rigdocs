@@ -21,6 +21,14 @@ Real-time telemetry streaming and 3D kinematic visualization are provided by the
 
 For in-depth architecture diagrams, complete IDL topic mappings, and internal math specifications (PD torques, mechanical power, tracking error formulas), refer directly to the [m2-pj Repository README](https://github.com/rignitc/m2-pj).
 
+```{figure} images/pj1.webp
+:alt: Svan M2 Simulation in MuJoCo
+:align: center
+:width: 80%
+
+PlotJuggler with Svan M2 DDS Plugin
+```
+
 ---
 
 ## 3. Getting Started
@@ -134,6 +142,14 @@ You can verify the entire pipeline without a physical robot using the built-in m
 | **Mesh Toggle** | Checkbox: toggle 3D STL meshes vs. kinematic stick skeleton |
 | **Live / Scrub Mode** | Toggle **Live** checkbox or drag timeline slider |
 | **Buffer Management** | Click **Buffer** button to toggle 30s rolling vs. full bag retention |
+
+```{figure} images/pj2.webp
+:alt: 3D Robot View
+:align: center
+:width: 80%
+
+3D Robot View
+```
 
 ### CLI Launcher Reference
 

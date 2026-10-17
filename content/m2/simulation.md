@@ -2,6 +2,14 @@
 
 A MuJoCo-based simulation environment for the **Svan M2 Metal** quadruped robot. This codebase provides a physics simulation setup for testing gaits, kinematics, and control pipelines safely on a workstation.
 
+```{figure} images/m2window.webp
+:alt: Svan M2 Simulation in MuJoCo
+:align: center
+:width: 60%
+
+Svan M2 Simulation in MuJoCo
+```
+
 ---
 
 ## Package & Setup
@@ -53,6 +61,14 @@ You will land automatically on the **Keyboard Interface** window (Window 3).
 ---
 
 ## Session Controls
+
+```{figure} images/terminal.webp
+:alt: Simulation Terminal
+:align: center
+:width: 70%
+
+Simulation Terminal
+```
 
 ### Tmux Navigation
 

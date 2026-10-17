@@ -2,6 +2,12 @@
 
 This guide covers building the low-level Cyclone DDS bindings and setting up control interfaces (Joystick Commander or the M2 API) to command the robot.
 
+```{note}
+
+This article is to control the robot using programmatic interfaces, not the physical joystick. For that refer to [Gamepad Usage](./etiquette.md).
+
+```
+
 ## 1. Prerequisites
 
 ```{important}
